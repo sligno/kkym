@@ -1,0 +1,37 @@
+{
+	"name": "kkym",
+	"version": "0.1.0",
+	"description": "Downloads and converts a Kakuyomu work into an EPUB structure for private offline reading.",
+	"author": "SLigno",
+	"license": "GPL-3.0-only",
+	"main": "./dist/index.js",
+	"bin": {
+		"kkym": "./dist/index.js"
+	},
+	"files": [
+		"assets/",
+		"dist/",
+		"LICENSE",
+		"README.md"
+	],
+	"scripts": {
+		"build": "tsc"
+	},
+	"type": "module",
+	"keywords": [],
+	"packageManager": "pnpm@12.9.1",
+	"dependencies": {
+		"commander": "^15.0.0",
+		"image-size": "^2.0.4",
+		"jsdom": "^30.0.1",
+		"mustache": "^4.2.0",
+		"sharp": "^0.35.5",
+		"uuid": "^14.0.2"
+	},
+	"devDependencies": {
+		"@types/jsdom": "^30.0.0",
+		"@types/mustache": "^4.2.6",
+		"@types/node": "^22.20.2",
+		"typescript": "^7.0.2"
+	}
+}

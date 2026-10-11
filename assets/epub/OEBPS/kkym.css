@@ -1,0 +1,129 @@
+@charset 'utf-8';
+
+body {
+	font-family:serif;
+	padding:0;
+	margin:0;
+}
+
+.layoutHorz {
+	-webkit-writing-mode:horizontal-tb;
+	writing-mode:horizontal-tb;
+}
+.layoutVert {
+	-webkit-writing-mode:vertical-rl;
+	writing-mode:vertical-rl;
+}
+
+h1 {
+	font-family:sans-serif;
+	font-size:180%;
+	margin:1rem 0;
+}
+h2 {
+	font-family:sans-serif;
+	font-size:180%;
+}
+h3 {
+	font-size:150%;
+}
+
+/** intro.html **/
+
+.work .bar {
+	background-color:black;		/* default */
+	width:40px;
+	height:10px;
+}
+.work .author {
+	margin:1rem 0;
+}
+.work .catchphrase {
+	font-size:120%;
+	font-weight:bold;
+	text-align:center;
+	margin:1rem 0 2rem 0;
+}
+.work .introduction p {
+	line-height:1.6em;
+	margin:0;
+}
+.work .meta {
+	font-family:sans-serif;
+	font-size:90%;
+	line-height:1.3em;
+	border-top:solid 1px #cccccc;
+	padding-top:1rem;
+	margin-top:1.5rem;
+}
+.work .meta span:not(:first-child)::before {
+	content:"\2022";
+	font-family:verdana,helvetica,sans-serif;
+	color:#999999;
+	margin-left:0.3ex;
+	margin-right:1ex;
+}
+.work .meta .url {
+	font-size:95%;
+}
+
+/** toc.html **/
+
+.toc ul {
+	list-style-type:none;
+	line-height:1.3em;
+	padding:0;
+}
+.toc .date {
+	font-size:87%;
+	color:#999999;
+}
+
+.toc.layoutVert h3 {
+	margin-top:2rem;
+	margin-left:3rem;
+}
+.toc.layoutVert ul {
+	margin-right:1em;
+	margin-left:1em;
+}
+.toc.layoutVert ul ul {
+	margin-top:1em;
+}
+.toc.layoutVert .date {
+	margin-top:1em;
+}
+
+/** episodes **/
+
+.layoutVert .chapter h2 {
+	margin-top:2.5rem;
+	margin-left:2rem;
+}
+.layoutVert .episode h3 {
+	margin-top:2.5rem;
+	margin-left:4rem;
+}
+
+.episode p {
+	line-height:1.6em;
+	margin:0;
+}
+.episode p.blank br {
+	line-height:1;
+}
+
+em.emphasisDots {
+	font-style:normal;
+	text-emphasis:sesame;
+}
+
+/** terms.html **/
+
+.terms div {
+	margin:3rem 1rem;
+}
+.terms p {
+	font-size:90%;
+	line-height:1.3em;
+}

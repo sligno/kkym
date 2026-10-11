@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://www.idpf.org/2007/opf" xmlns:dc="http://purl.org/dc/elements/1.1/" version="3.0" unique-identifier="uuid">
+<metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
+	<dc:identifier opf:scheme="uuid" id="uuid">{{uuid}}</dc:identifier>
+	<dc:language>ja</dc:language>
+	<dc:title>{{title}}</dc:title>
+	<dc:creator opf:role="aut">{{author}}</dc:creator>
+	<dc:publisher>カクヨム</dc:publisher>
+	<dc:date>{{editedAt}}</dc:date>
+	<meta name="primary-writing-mode" content="vertical-rl"/>
+{{#coverImage}}
+	<meta name="cover" content="cover-image"/>
+{{/coverImage}}
+{{^coverImage}}<!--
+	<meta name="cover" content="cover-image"/>
+-->{{/coverImage}}
+</metadata>
+<manifest>
+	<item id="cover" href="cover.xhtml" media-type="application/xhtml+xml"/>
+{{#coverImage}}
+	<item id="cover-image" href="{{file}}" media-type="image{{#type}}/{{.}}{{/type}}" properties="cover-image"/>
+{{/coverImage}}
+{{^coverImage}}<!--
+	<item id="cover-image" href="cover.jpg" media-type="image/jpeg" properties="cover-image"/>
+-->{{/coverImage}}
+	<item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
+    <item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>
+	<item id="css" href="OEBPS/kkym.css" media-type="text/css"/>
+	<item id="intro" href="OEBPS/intro.html" media-type="application/xhtml+xml"/>
+	<item id="toc" href="OEBPS/toc.html" media-type="application/xhtml+xml"/>
+{{#chapters}}
+{{#episodes}}
+	<item id="{{serialName}}" href="OEBPS/{{serialName}}.html" media-type="application/xhtml+xml"/>
+{{/episodes}}
+{{/chapters}}
+{{#episodes}}
+	<item id="{{serialName}}" href="OEBPS/{{serialName}}.html" media-type="application/xhtml+xml"/>
+{{/episodes}}
+	<item id="terms" href="OEBPS/terms.html" media-type="application/xhtml+xml"/>
+</manifest>
+<spine toc="ncx" page-progression-direction="rtl">
+	<itemref idref="cover" properties="rendition:layout-pre-paginated rendition:page-spread-center"/>
+	<itemref idref="intro"/>
+	<itemref idref="toc"/>
+{{#chapters}}
+{{#episodes}}
+	<itemref idref="{{serialName}}"/>
+{{/episodes}}
+{{/chapters}}
+{{#episodes}}
+	<itemref idref="{{serialName}}"/>
+{{/episodes}}
+	<itemref idref="terms"/>
+</spine>
+<guide>
+	<reference type="cover" href="cover.xhtml" title="表紙"/>
+	<reference type="text" href="OEBPS/intro.html" title="{{title}}"/>
+	<reference type="toc" href="OEBPS/toc.html" title="目次"/>
+</guide>
+</package>

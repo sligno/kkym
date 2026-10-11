@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+<head>
+<meta encoding="utf-8"/>
+<title>{{title}}</title>
+<link rel="stylesheet" type="text/css" href="kkym.css"/>
+</head>
+<body class="layoutVert mainText{{#newChapter}} newChapter{{/newChapter}}">
+{{#newChapter}}
+<div id="chap_{{id}}" class="chapter">
+<h2>{{title}}</h2>
+</div>
+{{/newChapter}}
+<div id="epi_{{id}}" class="episode">
+<h3>{{title}}</h3>
+<div class="episodeText">
+{{{content}}}
+</div>
+</div>
+</body>
+</html>

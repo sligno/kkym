@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+<head>
+<meta charset="utf-8"/>
+<title>{{title}}</title>
+<link rel="stylesheet" type="text/css" href="kkym.css"/>
+<style type="text/css">
+.title .bar {
+	background-color:{{baseColor}};
+}
+.catchphrase {
+	color:{{baseColor}};
+}
+</style>
+</head>
+<body id="work_{{id}}" class="layoutHorz work">
+<div class="title">
+	<div class="bar"></div>
+	<h1>{{title}}</h1>
+	<p class="author">{{author}}</p>
+</div>
+<p class="catchphrase">{{catchphrase}}</p>
+<div class="introduction">
+{{{introduction}}}
+</div>
+<div class="meta">
+	<div class="ratings">
+{{#isCruel}}<span class="isCruel">残酷描写あり</span>{{/isCruel}}
+{{#isViolent}}<span class="isViolent">暴力描写あり</span>{{/isViolent}}
+{{#isSexual}}<span class="isSexual">性描写あり</span>{{/isSexual}}
+	</div>
+	<div class="status">
+{{#localeStrings}}
+<span class="serialStatus">{{serialStatus}} {{publicEpisodeCount}}話</span>
+<span class="totalCharacterCount">{{totalCharacterCount}}文字</span>
+<span class="editedAt">{{editedAt.date}}更新</span>
+{{/localeStrings}}
+	</div>
+	<div class="url">
+<a href="https://kakuyomu.jp/works/{{id}}">https://kakuyomu.jp/works/{{id}}</a>
+	</div>
+</div>
+</body>
+</html>

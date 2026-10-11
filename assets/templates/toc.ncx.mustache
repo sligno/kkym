@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1" xml:lang="ja">
+<head>
+<meta name="dtb:uid" content="{{uuid}}"/>
+</head>
+<docTitle>
+	<text>{{title}}</text>
+</docTitle>
+<navMap>
+	<navPoint id="np_1" playOrder="1">
+		<navLabel><text>表紙</text></navLabel>
+		<content src="cover.xhtml"/>
+	</navPoint>
+	<navPoint id="np_2" playOrder="2">
+		<navLabel><text>{{title}}</text></navLabel>
+		<content src="OEBPS/intro.html"/>
+	</navPoint>
+	<navPoint id="np_3" playOrder="3">
+		<navLabel><text>目次</text></navLabel>
+		<content src="OEBPS/toc.html"/>
+	</navPoint>
+{{#chapters}}
+	<navPoint id="np_{{order}}" playOrder="{{order}}">
+		<navLabel><text>{{title}}</text></navLabel>
+{{#episodes}}
+{{#newChapter}}
+		<content src="OEBPS/{{serialName}}.html"/>
+{{/newChapter}}
+		<navPoint id="np_{{order}}" playOrder="{{order}}">
+			<navLabel><text>{{title}}</text></navLabel>
+			<content src="OEBPS/{{serialName}}.html"/>
+		</navPoint>
+{{/episodes}}
+	</navPoint>
+{{/chapters}}
+{{#episodes}}
+	<navPoint id="np_{{order}}" playOrder="{{order}}">
+		<navLabel><text>{{title}}</text></navLabel>
+		<content src="OEBPS/{{serialName}}.html"/>
+	</navPoint>
+{{/episodes}}
+	<navPoint id="np_99999" playOrder="99999">
+		<navLabel><text>使用条件</text></navLabel>
+		<content src="OEBPS/terms.html"/>
+	</navPoint>
+</navMap>
+</ncx>

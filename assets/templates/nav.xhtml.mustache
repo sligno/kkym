@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="ja">
+<head>
+<meta charset="utf-8"/>
+<title>目次</title>
+</head>
+<body>
+<nav epub:type="toc">
+<h1>目次</h1>
+<ol>
+<li><a href="OEBPS/intro.html">{{title}}</a></li>
+<li><a href="OEBPS/toc.html">目次</a></li>
+{{#chapters}}
+<li>
+{{#episodes}}
+{{#newChapter}}
+	<a href="OEBPS/{{serialName}}.html">{{title}}</a>
+	<ol>
+{{/newChapter}}
+		<li><a href="OEBPS/{{serialName}}.html">{{title}}</a></li>
+{{/episodes}}
+	</ol></li>
+{{/chapters}}
+{{#episodes}}
+<li><a href="OEBPS/{{serialName}}.html">{{title}}</a></li>
+{{/episodes}}
+<li><a href="OEBPS/terms.html">使用条件</a></li>
+</ol>
+</nav>
+</body>
+</html>
