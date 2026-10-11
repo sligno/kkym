@@ -426,7 +426,7 @@ export default class KkymWork implements Work
 					title: epi.title,
 					publishedAt: epi.publishedAt,
 					order: ++order,
-					serialName: chapter.id + "e"
+					serialName: chapter.serialName + "e"
 							+ (++count).toString().padStart(epiDig, "0"),
 				};
 				if (j === 0 && chapter.id !== "") {
