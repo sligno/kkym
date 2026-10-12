@@ -71,7 +71,7 @@ If not specified, a new UUID will be generated.`)
 // download commands.
 program.command("download")
 	.description(`Download raw HTML files from a Kakuyomu work. \
-Output files are automatically named using source IDs. \
+Output files are automatically named using sequential numbers. \
 Episodes and cover image (if any) are downloaded from the Kakuyomu website \
 even if URL parameter points to a local file.`)
 	.argument(...args("url"))
@@ -120,8 +120,7 @@ UUID will be missing.`)
 program.command("render-episodes")
 	.alias("episodes")
 	.description(`Render one or all episode pages. \
-Without --template, the raw HTML will be written out, which is \
-the same behavior as the 'download-episodes' command.`)
+Without --template, the raw HTML will be written out.`)
 	.argument(...args("url"))
 	.argument(...args("epid"))
 	.option(...options("op"))
