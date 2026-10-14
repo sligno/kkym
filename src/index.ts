@@ -133,7 +133,9 @@ program.command("render-cover")
 	.description(`Render a cover page using the given image file. \
 Note that this command doesn't use the work definition and the output \
 may not be the same as 'epubify' command.`)
-	.argument("<URL>", "URL or path to the cover image.")
+	.argument("<URL>", `URL, ID or filename of a Kakuyomu work. \
+Or if it ends with an image file extension such as '.jpg', assumed as a \
+direct URL or path to the image.`)
 	.option(...options("op"))
 	.option(...options("f"))
 	.option(...options("k"))

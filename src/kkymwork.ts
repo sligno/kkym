@@ -270,7 +270,8 @@ export default class KkymWork implements Work
 	chapters: Chapter[] = [];
 	//episodes: Episode[] = [];
 
-	// customization prop: force fetching original episodes.
+	// customization prop: force re-fetching from the web.
+	fetchCover: boolean = false;
 	fetchEpisodes: boolean = false;
 
 	// internal fields.
@@ -657,7 +658,7 @@ export default class KkymWork implements Work
 			for (const episode of chapter.episodes) {
 				const file = NodePath.join(dir,
 						Mustache.render(pattern, episode));
-				// check the output file before accessing the soruce data.
+				// check the output file before accessing the source data.
 				if (!await utils.checkOverwrite(file, overwrite)) {
 					logFn("Skipped:", file);
 					skipped++;
@@ -728,7 +729,7 @@ export default class KkymWork implements Work
 			if (file.includes("{{")) {
 				file = Mustache.render(file, episode);
 			}
-			// check the output file before accessing the soruce data.
+			// check the output file before accessing the source data.
 			if (!await utils.checkOverwrite(file, overwrite)) {
 				return false;
 			}
@@ -750,7 +751,7 @@ export default class KkymWork implements Work
 	}
 
 	/**
-	 * Retuns the episode content, either in the raw HTML format or
+	 * Returns the episode content, either in the raw HTML format or
 	 * as rendered using `template`.
 	 * By default, the episode content is read from the same location as
 	 * the work page, either from a local file <ID>.html or from the
@@ -758,7 +759,7 @@ export default class KkymWork implements Work
 	 * the content is always taken from the website regardless of the work
 	 * location.
 	 * @param episode - Episode object.
-	 * @param tempalte - Mustache template string to apply.
+	 * @param template - Mustache template string to apply.
 	 * @returns Episode content string.
 	 * @throws Any error from Node.js/fs/JSDOM.
 	 **/
@@ -874,34 +875,43 @@ export default class KkymWork implements Work
 	//}
 
 	/**
-	 * Downloads cover image if any.
+	 * Saves the cover image (if any) with the specified filename.
+	 * If the work was loaded locally, the image is supposed to exist
+	 * in the same directory as the work file unless
+	 * `KkymWork.fetchCover` is set to `true`.
 	 * @returns An object containing the image size and format as
 	 * `{ width: number, height: number, format: string }`.
 	 * If the work doesn't have a cover image, or `file` already exists
 	 * and not to be overwritten, `null` is returned.
 	 * @throws Any error from Node.js or dependent module.
 	 **/
-	public async downloadCover(file: string, format?: string,
+	public async saveCover(file: string, format?: string,
 			overwrite?: boolean): Promise<Record<string, any> | null>
 	{
-		assert(this.id && this.url);
-		if (!this.coverUrl) {
-			utils.debug("Cover image is not defined.");
-			return null;
-		}
-
-		// check the output file existence before accessing the soruce data.
+		// check the output file existence before accessing the source data.
 		if (file !== undefined) {
 			if (!await utils.checkOverwrite(file, overwrite)) {
 				return null;
 			}
 		}
 
-		// read and write the image data.
-		utils.debug("Fetching cover image:", this.coverUrl);
-		const response = await fetch(this.coverUrl);
-		const data = await response.bytes();
-		let buffer = Buffer.from(data);
+		let buffer: Buffer<ArrayBuffer>;
+
+		if (!this.local || this.fetchCover) {
+			// download from the original url.
+			utils.debug("Fetching cover image:", this.coverUrl);
+			const response = await fetch(this.coverUrl);
+			const data = await response.bytes();
+			buffer = Buffer.from(data);
+		} else {
+			// use local file.
+			const src = NodePath.join(NodePath.dirname(this.url),
+					NodePath.basename(this.coverUrl));
+			utils.debug("Using local image:", src);
+			const data = await fs.promises.readFile(src);
+			buffer = Buffer.from(data);
+		}
+
 		let dim = imageSize(buffer);
 		if (dim.type === "jpg") dim.type = "jpeg";	// fix format specifier
 

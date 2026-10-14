@@ -39,6 +39,7 @@ async function ensureFilePath(path: string,
 }
 
 async function renderEpisodes(url: string,
+		download: boolean = false,
 		options: Record<string, any>): Promise<void>
 {
 	console.info("Saving episodes...");
@@ -62,6 +63,9 @@ async function renderEpisodes(url: string,
 	if (!await work.load(url)) {
 		await warnMissingData(true);
 	}
+	if (download) {
+		work.fetchEpisodes = true;
+	}
 	await work.renderEpisodes(options.template ?? null,
 			dir, pattern,
 			options.skipExisting ? false : options.force,
@@ -69,6 +73,7 @@ async function renderEpisodes(url: string,
 }
 
 async function renderEpisode(url: string, id: string,
+		download: boolean = false,
 		options: Record<string, any>): Promise<void>
 {
 	utils.debug("Rendering episode:", id);
@@ -84,6 +89,9 @@ async function renderEpisode(url: string, id: string,
 	if (!await work.load(url)) {
 		await warnMissingData(false);
 	}
+	if (download) {
+		work.fetchEpisodes = true;
+	}
 
 	// if id is between 1 and episode count, assume it as an index.
 	const num = Number(id);
@@ -98,7 +106,7 @@ async function renderEpisode(url: string, id: string,
 /// Info Command
 
 /**
- * Dislays information about a Kakuyomu work. May be used to check if
+ * Displays information about a Kakuyomu work. May be used to check if
  * the work can be loaded and parsed successfully.
  **/
 export async function onInfo(url: string): Promise<void>
@@ -208,12 +216,13 @@ export async function onDownload(url: string,
 		utils.warn(e);
 	}
 
-	// save cover image if any.
+	// save cover image if any, without converting the format.
 	if (work.coverUrl) {
 		console.info("Saving cover image:", work.coverUrl);
+		work.fetchCover = true;
 		file = NodePath.join(dir, NodePath.basename(work.coverUrl));
 		try {
-			if (await work.downloadCover(file, overwrite)) {
+			if (await work.saveCover(file, undefined, overwrite)) {
 				console.info("Saved:", file);
 				saved++;
 			} else {
@@ -233,9 +242,9 @@ export async function onDownloadEpisodes(url: string, id: string,
 		options: Record<string, any>): Promise<void>
 {
 	if (id === undefined) {
-		await renderEpisodes(url, options);
+		await renderEpisodes(url, true, options);
 	} else {
-		await renderEpisode(url, id, options);
+		await renderEpisode(url, id, true, options);
 	}
 }
 
@@ -252,9 +261,10 @@ export async function onDownloadCover(url: string,
 		throw new Error("Work does not have a cover image.");
 	}
 
-	console.info("Saving cover image:", work.coverUrl);
+	console.info("Downloading cover image:", work.coverUrl);
 	let file = options.output;
 	let format;
+
 	if (file !== undefined) {
 		file = await ensureFilePath(file,
 				NodePath.basename(work.coverUrl),
@@ -269,7 +279,8 @@ export async function onDownloadCover(url: string,
 		}
 	}
 
-	await work.downloadCover(file, format,
+	work.fetchCover = true;
+	await work.saveCover(file, format,
 			options.skipExisting ? false : options.force);
 }
 
@@ -298,21 +309,27 @@ export async function onRenderEpisodes(url: string, id: string,
 		options.template = epub.templatePath("episode.html");
 	}
 	if (id === undefined) {
-		await renderEpisodes(url, options);
+		await renderEpisodes(url, false, options);
 	} else {
-		await renderEpisode(url, id, options);
+		await renderEpisode(url, id, false, options);
 	}
 }
 
 export async function onRenderCover(url: string,
 		options: Record<string, any>): Promise<void>
 {
+	const work: KkymWork = new KkymWork();
+	if (url.match(/\.(jpe?g|png|gif|webp|bmp)$/i)) {
+		work.coverUrl = url;
+	} else if (!await work.load(url)) {
+		await warnMissingData(false);
+	}
 	let file = options.output;
 	if (file !== undefined) {
 		file = ensureFilePath(file, "cover.xhtml", options.force);
 		utils.debug("Output filename:", file);
 	}
-	await epub.renderCover(url, file,
+	await epub.renderCover(work, file,
 			options.skipExisting ? false : options.force,
 			options.template);
 }

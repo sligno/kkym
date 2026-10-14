@@ -97,8 +97,8 @@ async function saveCoverImage(work: KkymWork, dir: string,
 	// check if the cover image already exists.
 	if (await utils.checkOverwrite(file, overwrite)) {
 		// download the image.
-		console.info("Downloadng cover image...");
-		dim = await work.downloadCover(file, type, true);
+		console.info("Saving cover image...");
+		dim = await work.saveCover(file, type, true);
 		if (!dim) {
 			throw new Error("Unexpected error: KkymWork.downloadCover returned null.");
 		}
@@ -255,44 +255,50 @@ async function renderContent(template: string,
  * @param overwrite - If `true`, overwrites existing file.
  * @param template - Mustache template file.
  **/
-export async function renderCover(url: string, file?: string,
+export async function renderCover(work: KkymWork, file?: string,
 		overwrite?: boolean, template?: string): Promise<boolean>
 {
 	if (template === undefined) {
 		template = templatePath(epubMetaFiles.cover ?? "");
 	}
 
-	// determine the image size.
-	let dim;
-	try {
-		if (url.match(/^https?:/)) {
-			utils.debug("Fetching image:", url);
-			const response = await fetch(url);
-			const data = await response.bytes();
-			const image = Buffer.from(data);
-			dim = imageSize(image);
-		} else {
-			if (url.match(/^file:/)) {
-				url = fileURLToPath(url);
+	let view: Record<string, any> = work.id ? work.getMetadata() :
+			{ coverUrl : work.coverUrl };
+
+	if (work.coverUrl) {
+		// has a cover image, determine the image size.
+		let url = work.coverUrl;
+		let dim;
+		try {
+			if (url.match(/^https?:/)) {
+				utils.debug("Fetching image:", url);
+				const response = await fetch(url);
+				const data = await response.bytes();
+				const image = Buffer.from(data);
+				dim = imageSize(image);
+			} else {
+				if (url.match(/^file:/)) {
+					url = fileURLToPath(url);
+				}
+				dim = await imageSizeFromFile(url);
 			}
-			dim = await imageSizeFromFile(url);
+			if (dim.type === "jpg") dim.type = "jpeg";
+			utils.debug("Cover image:", dim);
+			view.coverImage = {
+				file: NodePath.basename(url),
+				...dim
+			};
+		} catch (e) {
+			utils.error("Failed to read image:", url);
+			throw e;
 		}
-		if (dim.type === "jpg") dim.type = "jpeg";
-		utils.debug("Cover image:", dim);
-	} catch (e) {
-		utils.error("Failed to read image:", url);
-		throw e;
 	}
 
 	// apply mustache template.
 	let content;
 	try {
 		const tpl = await fs.promises.readFile(template, "utf-8");
-		content = Mustache.render(tpl, {
-			coverImage: {
-				file: NodePath.basename(url),
-				...dim,
-			}});
+		content = Mustache.render(tpl, view);
 	} catch (e) {
 		utils.debug("Failed to apply template:", template);
 		throw e;
