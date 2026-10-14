@@ -326,7 +326,7 @@ export async function onRenderCover(url: string,
 	}
 	let file = options.output;
 	if (file !== undefined) {
-		file = ensureFilePath(file, "cover.xhtml", options.force);
+		file = await ensureFilePath(file, "cover.xhtml", options.force);
 		utils.debug("Output filename:", file);
 	}
 	await epub.renderCover(work, file,
