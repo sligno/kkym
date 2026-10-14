@@ -3,7 +3,7 @@
 <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
 	<dc:identifier opf:scheme="uuid" id="uuid">{{uuid}}</dc:identifier>
 	<dc:language>ja</dc:language>
-	<dc:title>{{title}}</dc:title>
+	<dc:title>{{titleStripped}}</dc:title>
 	<dc:creator opf:role="aut">{{author}}</dc:creator>
 	<dc:publisher>カクヨム</dc:publisher>
 	<dc:date>{{editedAt}}</dc:date>
@@ -54,7 +54,7 @@
 </spine>
 <guide>
 	<reference type="cover" href="cover.xhtml" title="表紙"/>
-	<reference type="text" href="OEBPS/intro.html" title="{{title}}"/>
+	<reference type="text" href="OEBPS/intro.html" title="{{titleStripped}}"/>
 	<reference type="toc" href="OEBPS/toc.html" title="目次"/>
 </guide>
 </package>

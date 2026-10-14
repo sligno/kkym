@@ -102,6 +102,32 @@ async function convertImageFormat(buffer: Buffer<ArrayBuffer>,
 	return result;
 }
 
+function stripPromo(str: string): string
+{
+	type TitleStripFn = (str: string, re: RegExpMatchArray) => string;
+	type TitleStripMap = { regexp: string, stripFn: TitleStripFn };
+	const promo = "【[^】]*(書籍|コミカライズ|コミック|発売)[^】]*】";
+	const maps: TitleStripMap[] = [
+		{
+			regexp: `^${promo}`,
+			stripFn: (str, re) => str.slice(re[0].length)
+		},
+		{
+			regexp: `${promo}$`,
+			stripFn: (str, re) => str.slice(0, re.index ?? 0)
+		},
+	];
+	for (const map of maps) {
+		const rx = new RegExp(map.regexp);
+		while (1) {
+			const found = str.match(rx);
+			if (!found) break;
+			str = map.stripFn(str, found);
+		}
+	}
+	return str;
+}
+
 /// Kakuyomu JSON Structures
 
 interface jsonRef {
@@ -186,6 +212,7 @@ export interface Metadata {
 	publishedAt: string;
 	editedAt: string;
 	coverUrl: string;
+	titleStripped?: string;
 	localeStrings?: MetaLocaleStrings;
 }
 
@@ -195,6 +222,7 @@ export interface Work extends Metadata {
 	// KkymWork class always has chapters but not episodes.
 	chapters?: Chapter[];
 	episodes?: Episode[];
+	// title without promotional tokens, only in rendering view.
 }
 
 // locale strings
@@ -471,6 +499,7 @@ export default class KkymWork implements Work
 			publishedAt: this.publishedAt,
 			editedAt: this.editedAt,
 			coverUrl: this.coverUrl,
+			titleStripped: stripPromo(this.title),
 			localeStrings: {
 				genre: "",
 				serialStatus: "",
@@ -493,7 +522,7 @@ export default class KkymWork implements Work
 
 	/**
 	 * Returns an object containing the work information, which can then be
-	 * passed to `Musache.render` as `view` parameter.
+	 * passed to `Mustache.render` as `view` parameter.
 	 * The `localeStrings` fields in `Work`, `Chapter`, `Episode` objects
 	 * are populated.
 	 **/

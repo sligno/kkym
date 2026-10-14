@@ -262,6 +262,8 @@ export async function renderCover(work: KkymWork, file?: string,
 		template = templatePath(epubMetaFiles.cover ?? "");
 	}
 
+	// the rendering view is similar to EpubWorkView but not all the field
+	// are populated.
 	let view: Record<string, any> = work.id ? work.getMetadata() :
 			{ coverUrl : work.coverUrl };
 
