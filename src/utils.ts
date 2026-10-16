@@ -167,13 +167,13 @@ export function isDir(dir: string): boolean | undefined
 
 /**
  * Ensures that the directory exists. If not, create it.
- * @param dir - Diretcory path to check or create.
+ * @param dir - Directory path to check or create.
  * @param mkdir Specifies whether to create the directory if not exist.
  * When set to true, directory creation is done without prompt.
  * When set to false, an error is thrown if the directory does not exist.
  * When undefined, prompt use for creating a directory.
- * @returns Returns a positive value on success (1 = alerady exists,
- * 2 = newely created), or 0 if the directory creation is rejected by
+ * @returns Returns a positive value on success (1 = already exists,
+ * 2 = newly created), or 0 if the directory creation is rejected by
  * user.
  * @throws Any error from Node.js.
  **/
@@ -183,10 +183,10 @@ export async function ensureDir(dir: string,
 	const stat = isDir(dir);
 	if (stat !== undefined) {
 		if (stat) return 1;		// already exists
-		throw new Error(`Path is not a directoey: ${dir}`);
+		throw new Error(`Path is not a directory: ${dir}`);
 	}
 	if (mkdir === false) {
-		throw new Error(`Directory does not exst: ${dir}`);
+		throw new Error(`Directory does not exist: ${dir}`);
 	}
 	if (mkdir === undefined) {
 		const ans = await readChar(
@@ -219,7 +219,7 @@ export async function checkOverwrite(file: string,
  * @param content - String or binary data to be written.
  * @param file - Output filename. If undefined, stdout will be used.
  * @param overwrite - Whether to overwrite if the output file exists.
- * If undefined, a prmopt will be shown using `checkOverwrite`.
+ * If undefined, a prompt will be shown using `checkOverwrite`.
  * @throws Any error from Node.js.
  **/
 export async function writeFile(content: string | NodeJS.ArrayBufferView,
