@@ -9,6 +9,12 @@ This program has been developed for my personal use, only tested on a Windows en
   <figcaption>Converted MOBI sample, open in Kindle Previewer (オルクセン王国史)</figcaption>
 </figure>
 
+Output format:
+
+- The entire content is arranged vertically, read from right to left.
+- The work introduction page is an exception and written horizontally. If the description is long and spans more than one page in a reader program, the text reads left-to-right but the pages progress right-to-left.
+- In the vertical-layout pages, 1-/3-digit numbers and 1-/2-letter alphanumerics are rendered upright (CSS `text-orientation:upright`). 2-digit numbers are rendered combined upright (`text-combine-upright:all`). Longer alphanumerics are shown sideways. (More adjustments needed?)
+
 ## Install
 
 This program is written in TypeScript and managed using [pnpm](https://pnpm.io/). The release tarball contains the compiled JS code and necessary assets. Download the tarball and install it with:
@@ -46,11 +52,10 @@ kindlegen -c2 content.opf -o <MOBI-FILE>
 
 ## Customization
 
-For now, customization of the output layout/formatting could be done by modifying the static assets in src/assets and [mustache](https://mustache.github.io/) templates in src/templates.
+For now, customization of the output layout/formatting could be done by modifying the static assets in src/assets and [mustache](https://mustache.github.io/) templates in src/templates. Or just edit the generated files directly.
 
 ## Todo?
 
-- Keep 1- or 2-digit numbers upright (horizontally) in vertical text.
 - Make static assets overridable.
 
 ## Terms

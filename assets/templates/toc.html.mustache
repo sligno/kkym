@@ -9,17 +9,15 @@
 <h3>目次</h3>
 <ul>
 {{#chapters}}
-<li>{{title}}
+<li>{{{titleFormatted}}}
 	<ul>
 {{#episodes}}
-	<li><a href="{{serialName}}.html">{{title}}</a>
-		<span class="date">({{localeStrings.publishedAt.date}})</span></li>
+	<li><a href="{{serialName}}.html">{{{titleFormatted}}}</a></li>
 {{/episodes}}
 	</ul></li>
 {{/chapters}}
 {{#episodes}}
-<li><a href="{{serialName}}.html">{{title}}</a>
-	<span class="date">({{localeStrings.publishedAt.date}})</span></li>
+<li><a href="{{serialName}}.html">{{{titleFormatted}}}</a></li>
 {{/episodes}}
 </ul>
 </body>

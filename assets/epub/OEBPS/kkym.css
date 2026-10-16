@@ -32,6 +32,7 @@ h3 {
 	line-height:1.1em;
 	margin:0;
 }
+
 p {
 	margin:0;
 }
@@ -40,6 +41,14 @@ p {
 }
 .layoutVert p {
 	text-align:top;
+}
+
+span.alpha1, span.alpha2, span.alnum2,
+span.digit1, span.digit3, span.digit4 {
+	text-orientation:upright;
+}
+span.digit2 {
+	text-combine-upright:all;
 }
 
 /** intro.html **/
@@ -61,7 +70,7 @@ p {
 	border-width:1px;
 	border-color:#cccccc;
 }
-.work .meta span:not(:first-child)::before {
+.work .meta .prop:not(:first-child)::before {
 	content:"\2022";
 	font-family:verdana,helvetica,sans-serif;
 	color:#999999;
@@ -70,17 +79,43 @@ p {
 	font-size:95%;
 }
 
+.layoutHorz.work .bar {
+	width:40px;
+	height:10px;
+}
+.layoutHorz.work h1 {
+	margin-top:10px;
+	margin-bottom:0;
+}
+.layoutHorz.work .author {
+	margin-top:0.75rem;
+	margin-bottom:0;
+}
+.layoutHorz.work .catchphrase {
+	text-align:center;
+	margin:1rem 4rem 2rem;
+}
+.layoutHorz.work .meta {
+	border-top-style:solid;
+	padding-top:0.75rem;
+	margin-top:1.5rem;
+}
+.layoutHorz.work .meta .prop:not(:first-child)::before {
+	margin-left:0.3ex;
+	margin-right:1ex;
+}
+
 .layoutVert.work .bar {
 	width:10px;
 	height:40px;
 }
 .layoutVert.work h1 {
 	margin-right:10px;
+	margin-left:0;
 }
 .layoutVert.work .author {
 	text-align:right;
-	margin-right:1rem;
-	margin-bottom:1rem;
+	margin:1rem 0.75rem 1rem 0;
 }
 .layoutVert.work .catchphrase {
 	margin:4rem 1rem 4rem 2rem;
@@ -88,10 +123,10 @@ p {
 .layoutVert.work .meta {
 	border-right-style:solid;
 	padding-right:0.75rem;
-	padding-top:3rem;
+	padding-top:2rem;
 	margin-right:1.5rem;
 }
-.layoutVert.work .meta span:not(:first-child)::before {
+.layoutVert.work .meta .prop:not(:first-child)::before {
 	margin-top:0.3ex;
 	margin-bottom:1ex;
 }

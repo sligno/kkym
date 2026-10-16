@@ -8,11 +8,11 @@
 <body class="layoutVert mainText{{#newChapter}} newChapter{{/newChapter}}">
 {{#newChapter}}
 <div id="chap_{{id}}" class="chapter">
-<h2>{{title}}</h2>
+<h2>{{{titleFormatted}}}</h2>
 </div>
 {{/newChapter}}
 <div id="epi_{{id}}" class="episode">
-<h3>{{title}}</h3>
+<h3>{{{titleFormatted}}}</h3>
 <div class="episodeText">
 {{{content}}}
 </div>

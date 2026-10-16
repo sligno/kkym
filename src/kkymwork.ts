@@ -12,8 +12,7 @@ import * as utils from "./utils.ts";
 
 /// Helper Functions
 
-const assert = (process.env.NODE_DEV === "production") ? () => {} :
-		(condition: unknown, message?: any) => Assert(condition, message);
+const assert = (process.env.NODE_DEV === "production") ? () => {} : Assert;
 
 /**
  * Returns a value at the specified key path.
@@ -54,6 +53,68 @@ function getHtmlElement(html: string, id: string, json: boolean = false)
 				return `${attr.name}="${attr.value}"`;
 			}).join(" ") + ">");
 	return json ? JSON.parse(elem.innerHTML) : elem;
+}
+
+/**
+ * Adds HTML tags to content text for better rendering.
+ **/
+function markupText(text: string): string | null
+{
+	let html = "";
+
+	while (text !== "") {
+		// look for ascii alphanumeric chars.
+		const found = text.match(/[A-Za-z0-9]+/);
+		if (!found) {
+			if (html === "") return null;
+			html += text;
+			break;
+		}
+		assert(found.index !== undefined);
+		const index = found.index ?? 0;
+		const len = found[0].length;
+		html += text.slice(0, index);
+		text = text.slice(index + len);
+
+		// if followed by more latin/ipa chars, ignore the entire sequence.
+		const lat = text.match(/^(?:\s?[\u0021-\u02af]+)+/);
+		if (!lat) {
+			let cls = found[0].match(/^[0-9]+$/) ?  "digit" :
+					found[0].match(/^[A-Za-z]+$/) ? "alpha" : "alnum";
+			cls += ` ${cls}` + (len < 10) ? len.toString() : "x";
+			html += `<span class="${cls}">${found[0]}</span>`;
+		} else {
+			html += found[0] + lat[0];
+			text = text.slice(lat[0].length);
+		}
+	}
+
+	return html;
+}
+
+function markupChild(child: ChildNode)
+{
+	switch (child.nodeType) {
+		case 1:		// Node.ELEMENT_NODE
+			if (child.hasChildNodes()) {
+				const nodes = Array.from(child.childNodes);
+				for (const node of nodes) {
+					markupChild(node);
+				}
+			}
+			break;
+		case 3:		// Node.TEXT_NODE
+			if (child.textContent) {
+				let html = markupText(child.textContent);
+				if (html != null && child.parentElement) {
+					child.parentElement.innerHTML = html;
+				}
+			}
+			break;
+		default:
+			// do nothing.
+			break;
+	}
 }
 
 /**
@@ -162,12 +223,13 @@ type LocaleDateTime = Record<"date" | "time", string>;
 export interface Episode {
 	id: string;
 	title: string;
+	titleFormatted: string;
 	publishedAt: string;
 	order: number;
 	// chapter+episode name as c1e01, c1e02, c2e03, ...
 	serialName: string;
 	// chapter id and title, only in the first episode of a chapter.
-	newChapter?: Record<"id" | "title", string>;
+	newChapter?: Record<"id" | "title" | "titleFormatted", string>;
 	// formatted number/date/time strings.
 	localeStrings?: Record<"publishedAt", LocaleDateTime>;
 	// episode html content.
@@ -178,6 +240,7 @@ export interface Chapter {
 	id: string;
 	level: number;
 	title: string;
+	titleFormatted: string;
 	order: number;
 	serialName: string;	// c1, c2, ...
 	episodes: Episode[];
@@ -423,6 +486,7 @@ export default class KkymWork implements Work
 				id: "",
 				level: 0,
 				title: "",
+				titleFormatted: "",
 				order: 0,
 				serialName: "",
 				episodes: [],
@@ -436,6 +500,7 @@ export default class KkymWork implements Work
 				chapter.id = chap.id;
 				chapter.level = chap.level;
 				chapter.title = chap.title;
+				chapter.titleFormatted = markupText(chap.title) ?? chap.title;
 				chapter.order = ++order;
 				chapter.serialName = "c"
 						+ (i + 1).toString().padStart(chapDig, "0");
@@ -453,6 +518,7 @@ export default class KkymWork implements Work
 				const episode: Episode = {
 					id: epi.id,
 					title: epi.title,
+					titleFormatted: markupText(epi.title) ?? epi.title,
 					publishedAt: epi.publishedAt,
 					order: ++order,
 					serialName: chapter.serialName + "e"
@@ -537,21 +603,25 @@ export default class KkymWork implements Work
 					+ view.introduction.replace(/\n/g, "</p>\n<p>")
 					+ "</p>";
 		}
+		const setEpisodeExtra = (episodes: Episode[]) => {
+			for (const episode of episodes) {
+				episode.localeStrings = {
+					publishedAt: localeDateTime(episode.publishedAt),
+				};
+			}
+		};
 		if (this.chapters[0]?.id !== "") {
 			// has chapters.
 			view.chapters = structuredClone(this.chapters);
 			for (const chapter of view.chapters) {
-				for (const episode of chapter.episodes) {
-					episode.localeStrings = {
-						publishedAt: localeDateTime(episode.publishedAt),
-					};
-				}
+				setEpisodeExtra(chapter.episodes);
 			}
 		} else {
 			// no chapter, episodes only.
 			assert(this.chapters.length === 1);
 			assert(this.chapters[0].episodes.length);
 			view.episodes = structuredClone(this.chapters[0]?.episodes ?? []);
+			setEpisodeExtra(view.episodes);
 		}
 		return view;
 	}
@@ -835,6 +905,7 @@ export default class KkymWork implements Work
 						+ `Element with class="${key}" was not found.`);
 			}
 			content = Array.from(elems).map((elem) => {
+				markupChild(elem);
 				return elem.innerHTML.trim();
 			}).join("\n");
 		} finally {
