@@ -57,7 +57,7 @@ async function renderEpisodes(url: string,
 		if (!await utils.ensureDir(dir, options.force)) throw 1;
 	}
 	utils.debug("Output directory:", dir);
-	utils.debug("Output filenamae:", pattern);
+	utils.debug("Output filename:", pattern);
 
 	const work = new KkymWork();
 	if (!await work.load(url)) {
