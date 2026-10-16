@@ -529,6 +529,7 @@ export default class KkymWork implements Work
 					episode.newChapter = {
 						id: chapter.id,
 						title: chapter.title,
+						titleFormatted: chapter.titleFormatted,
 					};
 				}
 				chapter.episodes.push(episode);
