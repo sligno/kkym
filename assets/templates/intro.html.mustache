@@ -13,10 +13,10 @@
 }
 </style>
 </head>
-<body id="work_{{id}}" class="layoutVert work">
+<body id="work_{{id}}" class="layoutHorz work">
 <div class="title">
 	<div class="bar"></div>
-	<h1>{{titleStripped}}</h1>
+	<h1>{{title}}</h1>
 	<p class="author">{{author}}</p>
 </div>
 <p class="catchphrase">{{catchphrase}}</p>
@@ -25,15 +25,15 @@
 </div>
 <div class="meta">
 	<div class="ratings">
-{{#isCruel}}<span class="isCruel">残酷描写あり</span>{{/isCruel}}
-{{#isViolent}}<span class="isViolent">暴力描写あり</span>{{/isViolent}}
-{{#isSexual}}<span class="isSexual">性描写あり</span>{{/isSexual}}
+{{#isCruel}}<span class="prop isCruel">残酷描写あり</span>{{/isCruel}}
+{{#isViolent}}<span class="prop isViolent">暴力描写あり</span>{{/isViolent}}
+{{#isSexual}}<span class="prop isSexual">性描写あり</span>{{/isSexual}}
 	</div>
 	<div class="status">
 {{#localeStrings}}
-<span class="serialStatus">{{serialStatus}} {{publicEpisodeCount}}話</span>
-<span class="totalCharacterCount">{{totalCharacterCount}}文字</span>
-<span class="editedAt">{{editedAt.date}}更新</span>
+<span class="prop serialStatus">{{serialStatus}} {{publicEpisodeCount}}話</span>
+<span class="prop totalCharacterCount">{{totalCharacterCount}}文字</span>
+<span class="prop editedAt">{{editedAt.date}}更新</span>
 {{/localeStrings}}
 	</div>
 	<div class="url">
