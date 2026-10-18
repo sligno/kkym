@@ -70,22 +70,41 @@ function markupText(text: string): string | null
 			break;
 		}
 		assert(found.index !== undefined);
-		const index = found.index ?? 0;
-		const len = found[0].length;
+		let index = found.index ?? 0;
+		let len = found[0].length;
+		let enclose = [ "", "" ];
+
+		if (0 < index) {
+			// handle parens and quotation marks.
+			const prev = text.charAt(index - 1);
+			const next = text.charAt(index + len);
+			const pos = "([<{".indexOf(prev);
+			if (0 <= pos && pos === ")]>}".indexOf(next)) {
+				// could be (1), [A] and so on.
+				index--;
+				len += 2;
+				enclose = [ prev, next ];
+			}
+		}
 		html += text.slice(0, index);
 		text = text.slice(index + len);
 
 		// if followed by more latin/ipa chars, ignore the entire sequence.
 		const lat = text.match(/^(?:\s?[\u0021-\u02af]+)+/);
-		if (!lat) {
-			let cls = found[0].match(/^[0-9]+$/) ?  "digit" :
-					found[0].match(/^[A-Za-z]+$/) ? "alpha" : "alnum";
-			cls += ` ${cls}` + (len < 10) ? len.toString() : "x";
-			html += `<span class="${cls}">${found[0]}</span>`;
-		} else {
-			html += found[0] + lat[0];
+		if (lat) {
+			html += enclose[0] + found[0] + enclose[1] + lat[0];
 			text = text.slice(lat[0].length);
+			continue;
 		}
+
+		let cls = found[0].match(/^[0-9]+$/) ?  "digit" :
+				found[0].match(/^[A-Z]+$/) ? "alpha upper" :
+				found[0].match(/^[a-z]+$/) ? "alpha lower" :
+				found[0].match(/^[A-Za-z]+$/) ? "alpha" : "alnum";
+		cls += " cc" + ((len < 10) ? len.toString() : "x");
+		html += enclose[0]
+				+ `<span class="${cls}">${found[0]}</span>`
+				+ enclose[1];
 	}
 
 	return html;

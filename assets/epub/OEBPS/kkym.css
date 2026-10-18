@@ -45,13 +45,13 @@ p {
 	text-align:top;
 }
 
-span.alpha1, span.alpha2, span.alnum2,
-span.digit1, span.digit3, span.digit4 {
+/* numbers and alphabets */
+.cc1, .cc2, .digit.cc3, .digit.cc4, .upper {
 	text-orientation:upright;
 	-webkit-text-orientation:upright;
 	-epub-text-orientation:upright;
 }
-span.digit2 {
+.digit.cc2 {
 	-webkit-text-combine:horizontal;
 	-epub-text-combine:horizontal;
 	text-combine-upright:all;
@@ -59,6 +59,11 @@ span.digit2 {
 	-epub-text-combine-upright:all;
 	font-family:serif;		/* address kindle bug */
 	font-weight:normal;		/* address kindle bug */
+}
+.upper.ccx {	/* 10 or more chars */
+	text-orientation:mixed;
+	-webkit-text-orientation:mixed;
+	-epub-text-orientation:mixed;
 }
 
 /** intro.html **/
