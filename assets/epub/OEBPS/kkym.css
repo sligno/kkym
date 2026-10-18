@@ -7,29 +7,31 @@ body {
 }
 
 .layoutHorz {
-	-webkit-writing-mode:horizontal-tb;
 	writing-mode:horizontal-tb;
+	-webkit-writing-mode:horizontal-tb;
+	-epub-writing-mode:horizontal-tb;
 }
 .layoutVert {
-	-webkit-writing-mode:vertical-rl;
 	writing-mode:vertical-rl;
+	-webkit-writing-mode:vertical-rl;
+	-epub-writing-mode:vertical-rl;
 }
 
-h1 {
+h1 {	/* work title */
 	font-family:sans-serif;
-	font-size:180%;
+	font-size:150%;
 	line-height:1.2em;
 	margin:0;
 }
-h2 {
+h2 {	/* chapter title */
 	font-family:sans-serif;
-	font-size:180%;
-	line-height:1.1em;
+	font-size:140%;
+	line-height:1.2em;
 	margin:0;
 }
-h3 {
-	font-size:150%;
-	line-height:1.1em;
+h3 {	/* section title */
+	font-size:120%;
+	line-height:1.2em;
 	margin:0;
 }
 
@@ -46,29 +48,34 @@ p {
 span.alpha1, span.alpha2, span.alnum2,
 span.digit1, span.digit3, span.digit4 {
 	text-orientation:upright;
+	-webkit-text-orientation:upright;
+	-epub-text-orientation:upright;
 }
 span.digit2 {
+	-webkit-text-combine:horizontal;
+	-epub-text-combine:horizontal;
 	text-combine-upright:all;
+	-webkit-text-combine-upright:all;
+	-epub-text-combine-upright:all;
+	font-family:serif;		/* address kindle bug */
+	font-weight:normal;		/* address kindle bug */
 }
 
 /** intro.html **/
+
+.work p {
+	line-height:1.3em;
+}
 
 .work .bar {
 	background-color:black;	/* default */
 }
 .work .catchphrase {
-	font-size:110%;
-	line-height:1.1em;
 	font-weight:bold;
 }
-.work .introduction p {
-	line-height:1.4em;
-}
 .work .meta {
-	font-size:90%;
-	line-height:1.3em;
-	border-width:1px;
-	border-color:#cccccc;
+	font-size:88%;
+	line-height:1.2em;
 }
 .work .meta .prop:not(:first-child)::before {
 	content:"\2022";
@@ -84,6 +91,7 @@ span.digit2 {
 	height:10px;
 }
 .layoutHorz.work h1 {
+	text-align:left;
 	margin-top:10px;
 	margin-bottom:0;
 }
@@ -93,10 +101,10 @@ span.digit2 {
 }
 .layoutHorz.work .catchphrase {
 	text-align:center;
-	margin:1rem 4rem 2rem;
+	margin:1.5rem 3rem;
 }
 .layoutHorz.work .meta {
-	border-top-style:solid;
+	border-top:solid 1px #999999;
 	padding-top:0.75rem;
 	margin-top:1.5rem;
 }
@@ -121,9 +129,9 @@ span.digit2 {
 	margin:4rem 1rem 4rem 2rem;
 }
 .layoutVert.work .meta {
-	border-right-style:solid;
-	padding-right:0.75rem;
+	border-right:solid 1px #999999;
 	padding-top:2rem;
+	padding-right:0.75rem;
 	margin-right:1.5rem;
 }
 .layoutVert.work .meta .prop:not(:first-child)::before {
@@ -141,10 +149,6 @@ span.digit2 {
 .toc ul li {
 	line-height:1.3em;
 }
-.toc .date {
-	font-size:87%;
-	color:#999999;
-}
 
 .layoutVert.toc h3 {
 	margin-top:2rem;
@@ -157,20 +161,8 @@ span.digit2 {
 .layoutVert.toc ul ul {
 	margin-top:1em;
 }
-.layoutVert.toc .date {
-	margin-top:1em;
-}
 
 /** episodes **/
-
-.layoutVert .chapter h2 {
-	margin-top:2.5rem;
-	margin-left:1rem;
-}
-.layoutVert .episode h3 {
-	margin-top:2.5rem;
-	margin-left:3rem;
-}
 
 .episode p {
 	line-height:1.6em;
@@ -183,6 +175,15 @@ span.digit2 {
 em.emphasisDots {
 	font-style:normal;
 	text-emphasis:sesame;
+}
+
+.layoutVert .chapter h2 {
+	margin-top:2.5rem;
+	margin-left:1rem;
+}
+.layoutVert .episode h3 {
+	margin-top:2.5rem;
+	margin-left:3rem;
 }
 
 /** terms.html **/
