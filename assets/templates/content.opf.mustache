@@ -18,13 +18,13 @@
 <manifest>
 	<item id="cover" href="cover.xhtml" media-type="application/xhtml+xml"/>
 {{#coverImage}}
-	<item id="cover-image" href="{{file}}" media-type="image{{#type}}/{{.}}{{/type}}" properties="cover-image"/>
+	<item id="cover-image" href="{{file}}" media-type="image{{#format}}/{{.}}{{/format}}" properties="cover-image"/>
 {{/coverImage}}
 {{^coverImage}}<!--
 	<item id="cover-image" href="cover.jpg" media-type="image/jpeg" properties="cover-image"/>
 -->{{/coverImage}}
 	<item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
-    <item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>
+	<item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>
 	<item id="css" href="OEBPS/kkym.css" media-type="text/css"/>
 	<item id="intro" href="OEBPS/intro.html" media-type="application/xhtml+xml"/>
 	<item id="toc" href="OEBPS/toc.html" media-type="application/xhtml+xml"/>
