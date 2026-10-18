@@ -1,5 +1,4 @@
 import * as NodePath from "node:path";
-import * as UUID from "uuid";
 import Mustache from "mustache";
 
 import KkymWork from "./kkymwork.ts";
@@ -156,7 +155,7 @@ export async function onEpubify(url: string,
 	}
 	let uuid = options.uuid;
 	if (uuid === undefined) {
-		uuid = UUID.v7();
+		uuid = crypto.randomUUID();
 		utils.debug("Using newly generated UUID:", uuid);
 	}
 	await epub.epubify(work, dir, uuid, options.force, options.skipExisting);
