@@ -1,10 +1,8 @@
 import * as fs from "node:fs";
 import * as NodePath from "node:path";
-import { fileURLToPath } from "node:url";
 
 import Mustache from "mustache";
-import imageSize from "image-size";
-import { imageSizeFromFile } from "image-size/fromFile";
+import sharp from "sharp";
 
 import KkymWork, { type Metadata as KkymMetadata } from "./kkymwork.ts";
 import * as utils from "./utils.ts";
@@ -80,46 +78,47 @@ async function saveCoverImage(work: KkymWork, dir: string,
 		overwrite?: boolean): Promise<Record<string, any>>
 {
 	let name = "cover";	// default filename
-	let type = NodePath.extname(work.coverUrl).toLowerCase();
-	if (type !== "") {
-		type = type.slice(1);
-		if ([ "jpg", "webp" ].includes(type)) {
-			type = "jpeg";
+	let format = NodePath.extname(work.coverUrl).toLowerCase();
+	if (format !== "") {
+		format = format.slice(1);
+		if ([ "jpg", "webp" ].includes(format)) {
+			// webp may not be widely supported, use jpeg instead.
+			format = "jpeg";
 			name += ".jpg";
 		} else {
-			name += `.${type}`;
+			name += `.${format}`;
 		}
 	}
 
 	let file = NodePath.join(dir, name);
-	let dim;
+	let info;
 
 	// check if the cover image already exists.
 	if (await utils.checkOverwrite(file, overwrite)) {
 		// download the image.
 		console.info("Saving cover image...");
-		dim = await work.saveCover(file, type, true);
-		if (!dim) {
+		info = await work.saveCover(file, format, true);
+		if (!info) {
 			throw new Error("Unexpected error: KkymWork.downloadCover returned null.");
 		}
 		console.info("Saved:", file);
 	} else {
 		// use existing file.
-		utils.debug("Reusing cover image:", file);
+		utils.debug("Reusing local image:", file);
 		try {
-			dim = await imageSizeFromFile(file);
+			const image = sharp(file);
+			info = await image.metadata();
 		} catch (e) {
-			utils.debug(e);
-			throw new Error(`Failed to get image size: ${file}`);
+			utils.debug("Failed to load image:", file);
+			throw e;
 		}
-		if (dim.type === "jpg") dim.type = "jpeg";
 	}
 
 	return {
 		file: name,
-		width: dim.width,
-		height: dim.height,
-		type: dim.type ?? type,
+		width: info.width,
+		height: info.height,
+		format: info.format ?? format,
 	};
 }
 
@@ -250,7 +249,7 @@ async function renderContent(template: string,
 
 /**
  * Renders a cover page using the given image file and template.
- * @param url - URL or path to the cover image.
+ * @param work - KkymWork object.
  * @param file - Output filename. If undefined, stdout will be used.
  * @param overwrite - If `true`, overwrites existing file.
  * @param template - Mustache template file.
@@ -262,36 +261,19 @@ export async function renderCover(work: KkymWork, file?: string,
 		template = templatePath(epubMetaFiles.cover ?? "");
 	}
 
-	// the rendering view is similar to EpubWorkView but not all the field
-	// are populated.
+	// the rendering view is similar to EpubWorkView but only the
+	// cover-related fields are populated.
 	let view: Record<string, any> = work.id ? work.getMetadata() :
 			{ coverUrl : work.coverUrl };
-
 	if (work.coverUrl) {
 		// has a cover image, determine the image size.
-		let url = work.coverUrl;
-		let dim;
 		try {
-			if (url.match(/^https?:/)) {
-				utils.debug("Fetching image:", url);
-				const response = await fetch(url);
-				const data = await response.bytes();
-				const image = Buffer.from(data);
-				dim = imageSize(image);
-			} else {
-				if (url.match(/^file:/)) {
-					url = fileURLToPath(url);
-				}
-				dim = await imageSizeFromFile(url);
-			}
-			if (dim.type === "jpg") dim.type = "jpeg";
-			utils.debug("Cover image:", dim);
 			view.coverImage = {
-				file: NodePath.basename(url),
-				...dim
+				file: NodePath.basename(work.coverUrl),
+				...await work.getCoverInfo()
 			};
 		} catch (e) {
-			utils.error("Failed to read image:", url);
+			utils.error("Failed to read image:", work.coverUrl);
 			throw e;
 		}
 	}

@@ -4,9 +4,8 @@ import * as NodePath from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { JSDOM } from "jsdom";
-import sharp, { type FormatEnum, type JpegOptions, type PngOptions } from "sharp";
-import imageSize from "image-size";
 import Mustache from "mustache";
+import sharp, { type Sharp } from "sharp";
 
 import * as utils from "./utils.ts";
 
@@ -117,52 +116,6 @@ function markupChild(child: ChildNode)
 	}
 }
 
-/**
- * Converts image data into another format using sharp.
- **/
-async function convertImageFormat(buffer: Buffer<ArrayBuffer>,
-		format: string): Promise<Buffer<ArrayBuffer>>
-{
-	assert(format);
-	let result: Buffer<ArrayBuffer>;
-	let image;
-
-	try {
-		image = sharp(buffer);
-	} catch (e) {
-		utils.debug("Unable to load image.");
-		throw e;
-	}
-	try {
-		const meta = await image.metadata();
-		if (meta.format === format) {
-			utils.debug("No image conversion needed.");
-			return buffer;
-		}
-		utils.debug("Source image:", meta.format);
-	} catch (e) {
-		utils.debug("Failed to determine image format.", e);
-		// continue anyway.
-	}
-
-	utils.debug("Target image:", format);
-	try {
-		let options: JpegOptions | PngOptions = {};
-		if (format === "jpeg") {
-			options = { quality: 100 };
-		} else if (format === "png") {
-			options = { compressionLevel: 9, quality: 100 };
-		}
-		result = await image.toFormat(format as keyof FormatEnum, options)
-				.toBuffer();
-	} catch (e) {
-		utils.debug("Failed to convert image format.");
-		throw e;
-	}
-
-	return result;
-}
-
 function stripPromo(str: string): string
 {
 	type TitleStripFn = (str: string, re: RegExpMatchArray) => string;
@@ -217,6 +170,12 @@ interface jsonEpisode {
 }
 
 /// Interfaces
+
+interface CoverInfo {
+	width: number;
+	height: number;
+	format: string | undefined;
+}
 
 type LocaleDateTime = Record<"date" | "time", string>;
 
@@ -976,6 +935,52 @@ export default class KkymWork implements Work
 	//}
 
 	/**
+	 * Loads the cover image (if any) into a Sharp object.
+	 * @throws Any error from Node.js or Sharp.
+	 **/
+	protected async loadCover(): Promise<Sharp | null>
+	{
+		if (!this.coverUrl) {
+			utils.debug("Work does not have a cover image.");
+			return null;
+		}
+
+		let buffer: Buffer<ArrayBuffer>;
+
+		if (!this.local || this.fetchCover) {
+			// download from the original url.
+			utils.debug("Fetching:", this.coverUrl);
+			const response = await fetch(this.coverUrl);
+			const data = await response.bytes();
+			buffer = Buffer.from(data);
+		} else {
+			// use local file.
+			const src = NodePath.join(NodePath.dirname(this.url),
+					NodePath.basename(this.coverUrl));
+			utils.debug("Using file:", src);
+			const data = await fs.promises.readFile(src);
+			buffer = Buffer.from(data);
+		}
+
+		return sharp(buffer);
+	}
+
+	/**
+	 * Retrieves the size and format of the cover image.
+	 * @throws Any error from Node.js or Sharp.
+	 **/
+	public async getCoverInfo(): Promise<CoverInfo>
+	{
+		const image = await this.loadCover();
+		const meta = await image?.metadata();
+		return {
+			width: meta?.width ?? 0,
+			height: meta?.height ?? 0,
+			format: meta?.format.toString()
+		};
+	}
+
+	/**
 	 * Saves the cover image (if any) with the specified filename.
 	 * If the work was loaded locally, the image is supposed to exist
 	 * in the same directory as the work file unless
@@ -987,8 +992,11 @@ export default class KkymWork implements Work
 	 * @throws Any error from Node.js or dependent module.
 	 **/
 	public async saveCover(file: string, format?: string,
-			overwrite?: boolean): Promise<Record<string, any> | null>
+			overwrite?: boolean): Promise<CoverInfo | null>
 	{
+		let image = await this.loadCover();
+		if (!image) return null;
+
 		// check the output file existence before accessing the source data.
 		if (file !== undefined) {
 			if (!await utils.checkOverwrite(file, overwrite)) {
@@ -996,41 +1004,38 @@ export default class KkymWork implements Work
 			}
 		}
 
-		let buffer: Buffer<ArrayBuffer>;
-
-		if (!this.local || this.fetchCover) {
-			// download from the original url.
-			utils.debug("Fetching cover image:", this.coverUrl);
-			const response = await fetch(this.coverUrl);
-			const data = await response.bytes();
-			buffer = Buffer.from(data);
-		} else {
-			// use local file.
-			const src = NodePath.join(NodePath.dirname(this.url),
-					NodePath.basename(this.coverUrl));
-			utils.debug("Using local image:", src);
-			const data = await fs.promises.readFile(src);
-			buffer = Buffer.from(data);
+		// determine the input and output image formats.
+		const meta = await image.metadata();
+		if (format !== undefined && format !== meta.format) {
+			switch (format) {
+				case "jpeg":
+					image.jpeg({ quality: 90 });
+					break;
+				case "png":
+					image.png({ compressionLevel: 9, quality: 100 });
+					break;
+				case "gif":
+					image.gif();
+					break;
+				case "webp":
+					image.webp({ quality: 90 });
+					break;
+				default:
+					utils.debug("Unknown output format:", format);
+					throw new KkymError(`Unsupported cover format: ${format}`);
+			}
+			utils.debug("Converting image:", meta.format, "to", format);
 		}
 
-		let dim = imageSize(buffer);
-		if (dim.type === "jpg") dim.type = "jpeg";	// fix format specifier
-
-		// convert the format if necessary.
-		if (format !== undefined && format !== dim.type) {
-			utils.debug("Converting image:", dim.type, "to", format);
-			buffer = await convertImageFormat(buffer, format);
-			dim = imageSize(buffer);
-			if (dim.type == null) dim.type = format;
-			else if (dim.type === "jpg") dim.type = "jpeg";
+		const result = await image.toBuffer({ resolveWithObject: true });
+		utils.writeFile(result.data, file, true);
+		if (file === undefined) {
+			console.info("");
 		}
-
-		await utils.writeFile(buffer, file, true);
-		utils.debug("Saved:", file, dim);
 		return {
-			width: dim.width,
-			height: dim.height,
-			type: dim.type,
+			width: result.info.width,
+			height: result.info.height,
+			format: result.info.format
 		};
 	}
 }
