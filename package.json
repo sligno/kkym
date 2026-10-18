@@ -9,8 +9,8 @@
 		"kkym": "./dist/index.js"
 	},
 	"files": [
-		"assets/",
-		"dist/",
+		"assets",
+		"dist",
 		"LICENSE",
 		"README.md"
 	],
@@ -22,11 +22,9 @@
 	"packageManager": "pnpm@12.9.1",
 	"dependencies": {
 		"commander": "^15.0.0",
-		"image-size": "^2.0.4",
 		"jsdom": "^30.0.1",
 		"mustache": "^4.2.0",
-		"sharp": "^0.35.5",
-		"uuid": "^14.0.2"
+		"sharp": "^0.35.5"
 	},
 	"devDependencies": {
 		"@types/jsdom": "^30.0.0",
