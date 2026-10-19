@@ -12,7 +12,7 @@ program.configureOutput({
 	outputError: (str, write) => { write(utils.fixSentence(str)); },
 });
 
-program.description("Dowonload a Kakuyomu work for personal local use.");
+program.description("Download a Kakuyomu work for personal local use.");
 
 // define common arguments and options.
 const args = (key: string): [string, string] => {
