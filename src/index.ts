@@ -6,7 +6,7 @@ import * as utils from "./utils.ts";
 
 // override default messages.
 program.helpCommand("help", "Show this help.");
-program.helpOption("-h, --help", "Show this help.");
+program.helpOption("-?, --help", "Show this help.");
 program.configureHelp({ showGlobalOptions: true });
 program.configureOutput({
 	outputError: (str, write) => { write(utils.fixSentence(str)); },
@@ -96,11 +96,19 @@ stdout.`)
 program.command("download-cover")
 	.description(`Download the cover image if any. If --output is not \
 given, the binary data will be written to stdout. Otherwise the source \
-format may be converted to match the filename suffix.`)
+format may be converted to match the filename suffix. \
+If both --width and --height are specified, the larger-scaling one will \
+take effect to keep the aspect ratio.`)
 	.argument(...args("url"))
 	.option(...options("op"))
 	.option(...options("f"))
 	.option(...options("k"))
+	.option("-h, --height <NUM>", `Resize the image to the given height. \
+If 0 is passed, the height is enlarged to at least 1600px \
+only if smaller.`)
+	.option("-w, --width <NUM>", `Resize the image to the given width. \
+If 0 is passed, the width is enlarged to at least 1000px \
+only if smaller.`)
 	.action(cmd.onDownloadCover);
 
 // rendering commands, mainly for testing purposes.
@@ -130,12 +138,10 @@ Without --template, the raw HTML will be written out.`)
 	.action(cmd.onRenderEpisodes);
 
 program.command("render-cover")
-	.description(`Render a cover page using the given image file. \
-Note that this command doesn't use the work definition and the output \
-may not be the same as 'epubify' command.`)
+	.description(`Render a cover page using the given image file.`)
 	.argument("<URL>", `URL, ID or filename of a Kakuyomu work. \
-Or if it ends with an image file extension such as '.jpg', assumed as a \
-direct URL or path to the image.`)
+If it ends with an image file extension such as '.jpg', it's assumed as \
+a direct URL or path to the image and rendered without work definition.`)
 	.option(...options("op"))
 	.option(...options("f"))
 	.option(...options("k"))

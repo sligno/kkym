@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 import { JSDOM } from "jsdom";
 import Mustache from "mustache";
-import sharp, { type Sharp } from "sharp";
+import sharp, { type Sharp, type ResizeOptions } from "sharp";
 
 import * as utils from "./utils.ts";
 
@@ -1010,8 +1010,9 @@ export default class KkymWork implements Work
 	 * and not to be overwritten, `null` is returned.
 	 * @throws Any error from Node.js or dependent module.
 	 **/
-	public async saveCover(file: string, format?: string,
-			overwrite?: boolean): Promise<CoverInfo | null>
+	public async saveCover(file: string, overwrite?: boolean,
+			format?: string, width?: number, height?: number)
+			: Promise<CoverInfo | null>
 	{
 		let image = await this.loadCover();
 		if (!image) return null;
@@ -1023,21 +1024,47 @@ export default class KkymWork implements Work
 			}
 		}
 
-		// determine the input and output image formats.
 		const meta = await image.metadata();
+
+		// cover html may become blank on kindle devices if the image
+		// is too small. image height should at least be around 1600px.
+		if (height !== undefined || width !== undefined) {
+			let options: ResizeOptions = {
+				kernel: sharp.kernel.lanczos3,
+				withoutEnlargement: false,
+				fit: "outside"
+			};
+			if (width !== undefined) {
+				if (!width) width = 1000;	// might need adjustment
+				if (width !== meta.width) options.width = width;
+			}
+			if (height !== undefined) {
+				if (!height) height = 1600;
+				if (height !== meta.height) options.height = height;
+			}
+			utils.debug("Resizing image with:", options);
+			image = image.resize(options)
+				.sharpen({
+					sigma: 1.0,
+					m1: 1.0,	// flat
+					m2: 1.0		// jagged
+				});
+		}
+
+		// determine the output format.
 		if (format !== undefined && format !== meta.format) {
 			switch (format) {
 				case "jpeg":
-					image.jpeg({ quality: 90 });
+					image = image.jpeg({ quality: 90, mozjpeg: true });
 					break;
 				case "png":
-					image.png({ compressionLevel: 9, quality: 100 });
+					image = image.png({ compressionLevel: 9, quality: 100 });
 					break;
 				case "gif":
-					image.gif();
+					image = image.gif();
 					break;
 				case "webp":
-					image.webp({ quality: 90 });
+					image = image.webp({ quality: 90 });
 					break;
 				default:
 					utils.debug("Unknown output format:", format);

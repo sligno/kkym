@@ -221,7 +221,7 @@ export async function onDownload(url: string,
 		work.fetchCover = true;
 		file = NodePath.join(dir, NodePath.basename(work.coverUrl));
 		try {
-			if (await work.saveCover(file, undefined, overwrite)) {
+			if (await work.saveCover(file, overwrite)) {
 				console.info("Saved:", file);
 				saved++;
 			} else {
@@ -279,8 +279,11 @@ export async function onDownloadCover(url: string,
 	}
 
 	work.fetchCover = true;
-	await work.saveCover(file, format,
-			options.skipExisting ? false : options.force);
+	await work.saveCover(file,
+			options.skipExisting ? false : options.force,
+			format,
+			(options.width !== undefined) ? Number(options.width) : undefined,
+			(options.height !== undefined) ? Number(options.height) : undefined);
 }
 
 /// Rendering Commands

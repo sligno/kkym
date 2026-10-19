@@ -72,7 +72,8 @@ async function copyTree(from: string, to: string,
 
 /**
  * Saves the cover image to the EPUB structure and returns an object
- * containing the image info to be used as a rendering view.
+ * containing the image info to be used as a rendering view. The image
+ * may be automatically enlarged if the height is too small.
  **/
 async function saveCoverImage(work: KkymWork, dir: string,
 		overwrite?: boolean): Promise<Record<string, any>>
@@ -97,7 +98,7 @@ async function saveCoverImage(work: KkymWork, dir: string,
 	if (await utils.checkOverwrite(file, overwrite)) {
 		// download the image.
 		console.info("Saving cover image...");
-		info = await work.saveCover(file, format, true);
+		info = await work.saveCover(file, true, format, undefined, 0);
 		if (!info) {
 			throw new Error("Unexpected error: KkymWork.downloadCover returned null.");
 		}
