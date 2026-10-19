@@ -612,7 +612,7 @@ export default class KkymWork implements Work
 	 * @param overwrite - If defined, specifies whether to overwrite the
 	 * the existing file. If undefined, prompts user for confirmation.
 	 * @param template - Mustache template filename to convert the HTML
-	 * content. If not specifieed, the raw HTML is emitted.
+	 * content. If not specified, the raw HTML is emitted.
 	 * @returns true on success, or false if the file exists and skipped.
 	 * @throws {KkymError} if the object is not loaded with a valid work,
 	 * or any error from Node.js.

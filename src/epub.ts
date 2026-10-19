@@ -38,7 +38,7 @@ async function copyTree(from: string, to: string,
 			recursive: false
 		});
 	} catch (e) {
-		utils.error("Unable to read directoroy:", from);
+		utils.error("Unable to read directory:", from);
 		throw e;
 	}
 	for (const ent of entries) {
@@ -172,7 +172,7 @@ export async function epubify(work: KkymWork,
 	// this ensures the output directory structure.
 	await copyTree(assetPath("epub"), dir, overwrite);
 
-	// prepare the work renderng view.
+	// prepare the work rendering view.
 	let view: EpubWorkView = {
 		...work.makeWorkView(),
 		uuid: uuid,
