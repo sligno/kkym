@@ -16,6 +16,9 @@ body {
 	-webkit-writing-mode:vertical-rl;
 	-epub-writing-mode:vertical-rl;
 }
+body.layoutVert div.contentWrapper {
+	margin:0.25rem;
+}
 
 h1 {	/* work title */
 	font-family:sans-serif;
@@ -72,14 +75,23 @@ p {
 	line-height:1.3em;
 }
 
+.work .title {
+	margin-top:0.5rem;
+}
 .work .bar {
 	background-color:black;	/* default */
 }
 .work .catchphrase {
 	font-weight:bold;
 }
+.work .introduction {
+	font-size:92%;
+}
+.work .introduction p {
+	line-height:1.4em;
+}
 .work .meta {
-	font-size:88%;
+	font-size:87%;
 	line-height:1.2em;
 }
 .work .meta .prop:not(:first-child)::before {
@@ -160,11 +172,11 @@ p {
 	margin-left:2rem;
 }
 .layoutVert.toc ul {
-	margin-right:1em;
-	margin-left:1em;
+	margin-right:0.75rem;
+	margin-left:0.75rem;
 }
 .layoutVert.toc ul ul {
-	margin-top:1em;
+	margin-top:1rem;
 }
 
 /** episodes **/
@@ -198,6 +210,6 @@ em.emphasisDots {
 	line-height:1.3em;
 }
 
-.layoutVert.terms div {
+.layoutVert.terms div.contentWrapper {
 	margin:6rem 1rem 0 1rem;
 }
